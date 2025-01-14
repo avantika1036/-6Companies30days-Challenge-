@@ -1,0 +1,43 @@
+/* Question: An image smoother is a filter of the size 3 x 3 that can be applied to each cell of an image by rounding down the average of the cell and the eight surrounding cells (i.e., the average of the nine cells in the blue smoother). If one or more of the surrounding cells of a cell is not present, we do not consider it in the average (i.e., the average of the four cells in the red smoother).
+Given an m x n integer matrix img representing the grayscale of an image, return the image after applying the smoother on each cell of it.
+
+Difficulty: Easy */
+
+class Solution {
+public:
+    int applyImgSmoother(vector<vector<int>>& img, int i, int j)
+    {
+        int r = img.size(), c = img[0].size(), sum = img[i][j], count = 1;
+        vector<pair<int, int>> dirs = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+
+        for(auto dir : dirs)
+        {
+            int new_row = dir.first;
+            int new_col = dir.second;
+
+            if(i + new_row >= 0 && i + new_row < r && j + new_col >= 0 && j + new_col < c)
+            {
+                sum += img[i + new_row][j + new_col];
+                count ++;
+            }
+        }
+
+        return sum / count;
+    }
+
+    vector<vector<int>> imageSmoother(vector<vector<int>>& img)
+    {
+        int r = img.size(), c = img[0].size();
+        vector<vector<int>> ans(r, vector<int>(c, -1));
+
+        for(int i = 0; i < r; i++)
+        {
+            for(int j = 0; j < c; j++)
+            {
+                ans[i][j] = applyImgSmoother(img, i, j);
+            }
+        }
+
+        return ans;
+    }
+};
