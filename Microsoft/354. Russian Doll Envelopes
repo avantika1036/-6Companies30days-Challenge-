@@ -1,0 +1,45 @@
+/* You are given a 2D array of integers envelopes where envelopes[i] = [wi, hi] represents the width and the height of an envelope.
+One envelope can fit into another if and only if both the width and height of one envelope are greater than the other envelope's width and height.
+Return the maximum number of envelopes you can Russian doll (i.e., put one inside the other).
+Note: You cannot rotate an envelope.
+
+Difficulty: Hard */
+
+bool comp(vector<int> a, vector<int> b)
+{
+    if(a[0] == b[0]) return a[1] > b[1]; // sort height in descending order so that they together can't be included in LIS if width is same
+
+    return a[0] < b[0]; // else sort width in ascending order
+}
+
+class Solution {
+public:
+    int maxEnvelopes(vector<vector<int>>& envelopes) {
+        int n = envelopes.size(), count = 1;
+        sort(envelopes.begin(), envelopes.end(), comp);
+
+        vector<int> heights;
+        for(auto envelope : envelopes)
+        {
+            heights.push_back(envelope[1]);
+        }
+
+        vector<int> ans;
+
+        for(int ht: heights)
+        {
+            if(ans.empty() || ht > ans.back())
+            {
+                ans.push_back(ht);
+            }
+
+            else
+            {
+                int ind = lower_bound(ans.begin(), ans.end(), ht) - ans.begin(); // binary search
+                ans[ind] = ht;
+            }
+        }
+
+        return ans.size();
+    }
+};
