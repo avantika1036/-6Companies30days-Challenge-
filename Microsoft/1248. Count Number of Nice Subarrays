@@ -1,0 +1,98 @@
+/* Given an array of integers nums and an integer k. A continuous subarray is called nice if there are k odd numbers on it.
+
+Return the number of nice sub-arrays.
+
+Difficulty: Medium */
+
+
+// Solution 1: Prefix Sum Method
+class Solution {
+public:
+    int numberOfSubarrays(vector<int>& nums, int k) {
+        int sum = 0, count = 0;
+        unordered_map<int, int> mpp;
+        mpp[0] = 1; // 1 way to achieve sum 0
+
+        for(int i = 0; i < nums.size(); i++)
+        {
+            sum += nums[i] % 2;
+
+            if(mpp.find(sum - k) != mpp.end())
+            {
+                count += mpp[sum - k];
+            }
+            mpp[sum]++;
+        }
+
+        return count;
+    }
+};
+
+
+// Solution 2: 2 pointer method while calculating Binary Sum
+class Solution {
+public:
+    int countNiceSubarray(vector<int>& nums, int k)
+    {
+        if(k < 0) return 0;
+        int n = nums.size(), count = 0, left = 0, right = 0, sum = 0;
+
+        while(right < n)
+        {
+            sum += (nums[right] % 2);
+
+            while(sum > k) // if sum > k reduce the size till we get valid subarray
+            {
+                sum -= (nums[left] % 2);
+                left++;
+            }
+
+            count += (right - left + 1); // add all subarrays if sum <= k
+            right++;
+        }
+
+        return count;
+    }
+
+    int numberOfSubarrays(vector<int>& nums, int k) {
+        int sum1 = countNiceSubarray(nums, k); // all subarrays with sum <= k
+        int sum2 = countNiceSubarray(nums, k - 1); // all subarrays with sum <= k - 1
+
+        return sum1 - sum2;
+    }
+};
+
+
+// Solution 3: 2 pointer method whilemcalculating no. of odd numbers
+class Solution {
+public:
+    int numberOfSubarrays(vector<int>& nums, int k) {
+        int n = nums.size(), count = 0, left = 0, right = 0, valid_starts = 0, count_odds = 0;
+
+        while(right < n)
+        {
+            if(nums[right] % 2 == 1) // odd
+            {
+                count_odds++;
+                valid_starts = 0;
+            }
+
+            while(count_odds == k)
+            {
+                valid_starts++;
+
+                if(nums[left] % 2 == 1)
+                {
+                    count_odds--;
+                }
+
+                left++;
+            }
+
+            count += valid_starts; // if num is even then all prev valid_starts will also be valid for new num as well 
+            right++;
+        }
+
+        return count;
+    }
+};
