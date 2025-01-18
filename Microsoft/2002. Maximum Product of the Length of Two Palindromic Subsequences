@@ -1,0 +1,96 @@
+/* Question: Given a string s, find two disjoint palindromic subsequences of s such that the product of their lengths is maximized. The two subsequences are disjoint if they do not both pick a character at the same index.
+
+Return the maximum possible product of the lengths of the two palindromic subsequences.
+
+A subsequence is a string that can be derived from another string by deleting some or no characters without changing the order of the remaining characters. A string is palindromic if it reads the same forward and backward.
+
+Difficulty: Medium */
+
+Solution 1: Time Complexity: n*(3^n)
+class Solution {
+public:
+    bool isPalindrome(string& s)
+    {
+        int i = 0, j = s.length() - 1;
+
+        while(i < j)
+        {
+            if(s[i] != s[j]) return false;
+            i++;
+            j--;
+        }
+
+        return true;
+    }
+
+    int findMaxProduct(string s, string a, string b, int i)
+    {
+        if(i == s.length())
+        {
+            if(isPalindrome(a) && isPalindrome(b))
+            {
+                return a.length() * b.length();
+            }
+
+            return 0;
+        }
+
+        int pickA = findMaxProduct(s, a + s[i], b, i + 1);
+
+        int pickB = findMaxProduct(s, a, b + s[i], i + 1);
+
+        int notPick = findMaxProduct(s, a, b, i + 1);
+
+        return max(pickA, max(pickB, notPick));
+    }
+
+    int maxProduct(string s) {
+        return findMaxProduct(s, "", "", 0);
+    }
+};
+
+
+Solution 2: Time Complexity: n *(2^n)
+class Solution {
+public:
+    int ans = 0;
+    bool isPalindrome(string& s)
+    {
+        int i = 0, j = s.length() - 1;
+
+        while(i < j)
+        {
+            if(s[i] != s[j]) return false;
+            i++;
+            j--;
+        }
+
+        return true;
+    }
+
+    void findMaxProduct(string& s, string& s1, string& s2, int i)
+    {
+        if(isPalindrome(s1) && isPalindrome(s2))
+        {
+            ans = max(ans, (int)(s1.length() * s2.length()));
+        }
+
+        for(int ind = i; ind < s.length(); ind++)
+        {
+            s1.push_back(s[ind]);
+            findMaxProduct(s, s1, s2, ind + 1);
+            s1.pop_back();
+
+            s2.push_back(s[ind]);
+            findMaxProduct(s, s1, s2, ind + 1);
+            s2.pop_back();
+        }
+    }
+
+    int maxProduct(string s) {
+        string s1 = "", s2 = "";
+        findMaxProduct(s, s1, s2, 0);
+
+        return ans;
+    }
+};
