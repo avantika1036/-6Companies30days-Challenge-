@@ -1,0 +1,59 @@
+/* Question: You are given two 0-indexed strings source and target, both of length n and consisting of lowercase English letters. You are also given two 0-indexed character arrays original and changed, and an integer array cost, where cost[i] represents the cost of changing the character original[i] to the character changed[i].
+
+You start with the string source. In one operation, you can pick a character x from the string and change it to the character y at a cost of z if there exists any index j such that cost[j] == z, original[j] == x, and changed[j] == y.
+
+Return the minimum cost to convert the string source to the string target using any number of operations. If it is impossible to convert source to target, return -1.
+
+Note that there may exist indices i, j such that original[j] == original[i] and changed[j] == changed[i].
+
+Difficulty: Medium */
+
+
+class Solution {
+public:
+    long long minimumCost(string source, string target, vector<char>& original, vector<char>& changed, vector<int>& cost) {
+        vector<vector<long long>> dp(26, vector<long long>(26, INT_MAX)); //store min distance from one char to another
+
+        for(int i = 0; i < 26; i++) dp[i][i] = 0;
+
+        for(int i = 0; i < original.size(); i++) // cost for orignal to changed chars
+        {
+            int u = original[i] - 'a';
+            int v = changed[i] - 'a';
+
+            dp[u][v] = min(dp[u][v], (long long) cost[i]);
+        }
+
+        // Floyd Warshall
+        for(int k = 0; k < 26; k++)
+        {
+            for(int i = 0; i < 26; i++)
+            {
+                for(int j = 0; j < 26; j++)
+                {
+                    if(dp[i][k] < INT_MAX && dp[k][j] < INT_MAX)
+                    {
+                        dp[i][j] = min(dp[i][j], dp[i][k] + dp[k][j]);
+                    }
+                }
+            }
+        }
+
+        long long total_cost = 0;
+        for(int i = 0; i < source.size(); i++)
+        {
+            if(source[i] == target[i]) continue; // same chars
+
+            int start = source[i] - 'a';
+            int end = target[i] - 'a';
+
+            // no possible way to switch the chars
+            if(dp[start][end] == INT_MAX) return -1;
+
+            total_cost += dp[start][end];
+        }
+
+
+        return total_cost;
+    }
+};
