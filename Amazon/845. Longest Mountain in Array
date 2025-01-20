@@ -1,0 +1,113 @@
+/* Question: You may recall that an array arr is a mountain array if and only if:
+
+arr.length >= 3
+There exists some index i (0-indexed) with 0 < i < arr.length - 1 such that:
+- arr[0] < arr[1] < ... < arr[i - 1] < arr[i]
+- arr[i] > arr[i + 1] > ... > arr[arr.length - 1]
+Given an integer array arr, return the length of the longest subarray, which is a mountain. Return 0 if there is no mountain subarray.
+
+Difficulty: Medium */
+
+
+// Solution 1 : TC - O(N ^ 2), SC - O(1)
+class Solution {
+public:
+    int longestMountain(vector<int>& nums) {
+        int maxi = 0;
+
+        for(int i = 1; i < nums.size() - 1; i++)
+        {
+            int j = i, count_left = 0;
+            while(j > 0)
+            {
+                if(nums[j] > nums[j - 1]) count_left++;
+                else break;
+                j--;
+            }
+
+            int count_right = 0;
+            j = i;
+            while(j < nums.size() - 1)
+            {
+                if(nums[j] > nums[j + 1]) count_right++;
+                else break;
+                j++;           
+            }
+
+            if(maxi < count_right + count_left + 1 && count_right > 0 && count_left > 0)
+            {
+                maxi = count_right + count_left + 1;
+            }
+        }
+
+        return maxi >= 3 ? maxi : 0;
+    }
+};
+
+
+// Solution 2: TC - O(N), SC - O(N)
+class Solution {
+public:
+    int longestMountain(vector<int>& nums) {      
+        int maxi = 0, n = nums.size();
+        vector<int> inc(n, 0);
+        vector<int> dec(n, 0);
+
+        for(int i = 1; i < n; i++)
+        {
+            if(nums[i] > nums[i - 1]) inc[i] = inc[i - 1] + 1;;
+        }
+
+        for(int i = n - 2; i >= 0; i--)
+        {
+            if(nums[i] > nums[i + 1]) dec[i] = dec[i + 1] + 1;
+
+            if(maxi < inc[i] + dec[i] + 1 && inc[i] > 0 && dec[i] > 0)
+            {
+                maxi = inc[i] + dec[i] + 1;
+            }
+        }
+
+        return maxi;
+    }
+};
+
+
+// Solution 3: TC - O(N), SC - O(1)
+class Solution {
+public:
+    int longestMountain(vector<int>& nums) {      
+        int maxi = 0, i = 1, n = nums.size();
+        
+        while(i < n)
+        {       
+            while(i < n && nums[i] == nums[i - 1]) // skip the plateau
+            {
+                i++;
+            }
+
+            // finding increasing length
+            int up = 0;
+            while(i < n && nums[i] > nums[i - 1])
+            {
+                up++;
+                i++;
+            }
+    
+            // finding decreasing length
+            int down = 0;
+            while(i < n && nums[i] < nums[i - 1])
+            {
+                down++;
+                i++;
+            }
+
+            if(up > 0 && down > 0)
+            {
+                maxi = max(maxi, up + down + 1);
+            }
+        }
+
+        return maxi;
+    }
+};
