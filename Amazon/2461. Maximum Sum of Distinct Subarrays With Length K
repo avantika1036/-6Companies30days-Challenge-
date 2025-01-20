@@ -1,0 +1,40 @@
+/* Question: You are given an integer array nums and an integer k. Find the maximum subarray sum of all the subarrays of nums that meet the following conditions:
+
+The length of the subarray is k, and
+All the elements of the subarray are distinct.
+Return the maximum subarray sum of all the subarrays that meet the conditions. If no subarray meets the conditions, return 0.
+
+A subarray is a contiguous non-empty sequence of elements within an array.
+
+Difficulty: Medium */
+
+
+class Solution {
+public:
+    long long maximumSubarraySum(vector<int>& nums, int k) {
+        int n = nums.size(), l = 0, r = 0;
+        long long sum = 0, maxi = 0;
+        unordered_map<int, int> mpp;
+
+        for(int i = 0; i < n; i++)
+        {
+            mpp[nums[i]]++;
+            sum += nums[i];
+
+            if(i >= k) // more element than k
+            {
+                sum -= nums[i - k];
+                mpp[nums[i - k]]--;
+
+                if(mpp[nums[i - k]] == 0) mpp.erase(nums[i - k]);
+            }
+
+            // check for sum if the numbers are not duplicates and equal to k
+            if(mpp.size() == k)
+            {
+                maxi = max(maxi, sum);
+            }
+        }
+        return maxi;
+    }
+};
