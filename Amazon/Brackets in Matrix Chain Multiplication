@@ -1,0 +1,102 @@
+/* Question: Given an array arr[] of length n used to denote the dimensions of a series of matrices such that the dimension of i'th matrix is arr[i] * arr[i+1]. There are a total of n-1 matrices. Find the most efficient way to multiply these matrices together. 
+As in MCM, you were returning the most effective count but this time return the string which is formed of A - Z (only Uppercase) denoting matrices & Brackets( "(" ")" ) denoting multiplication symbols. For example, if n =11, the matrixes can be denoted as A - K as n<=26 & brackets as multiplication symbols.
+
+NOTE:
+
+Each multiplication is denoted by putting open & closed brackets to the matrices multiplied & also, please note that the order of matrix multiplication matters, as matrix multiplication is non-commutative A*B != B*A
+As there can be multiple possible answers, the console would print "true" for the correct string and "false" for the incorrect string. You need to only return a string that performs a minimum number of multiplications
+
+Difficulty: Hard */
+
+
+// Memoization
+// User function Template for C++
+class Solution {
+  public:
+    pair<string, int> Order(vector<int> &arr, int i, int j, vector<vector<pair<string, int>>>& dp)
+    {
+        if(i == j)
+        {
+            string base = "";
+            base += 'A' + i - 1;
+            return {base, 0};
+        }
+        
+        if(dp[i][j].second != -1) return dp[i][j];
+        
+        int min_steps = 1e9;
+        string best_string;
+        
+        for(int k = i; k <= j - 1; k++)
+        {
+            auto left_matrix = Order(arr, i, k, dp); 
+            auto right_matrix = Order(arr, k + 1, j, dp);
+            
+            int steps = arr[i - 1] * arr[k] * arr[j] +
+             left_matrix.second + 
+             right_matrix.second;
+            string s = '(' + left_matrix.first + right_matrix.first + ')';
+            
+            if(steps < min_steps)
+            {
+                min_steps = steps;
+                best_string = s; 
+            }
+        }
+        
+        return dp[i][j] = {best_string, min_steps};
+    }
+  
+    string matrixChainOrder(vector<int> &arr) {
+        int n = arr.size();
+        vector<vector<pair<string, int>>> dp(n, vector<pair<string, int>>(n, {"", -1}));
+        return Order(arr, 1, n - 1, dp).first; // returns minimum steps along with the string of that partition
+    }
+};
+
+
+// Tabulation
+class Solution {
+  public:
+    string matrixChainOrder(vector<int> &arr) {
+        int n = arr.size();
+        vector<vector<pair<string, int>>> dp(n, vector<pair<string, int>>(n, {"", 0}));
+        
+        for(int i = 1; i < n; i++)
+        {
+            string st = "";
+            st += 'A' + i - 1;
+            dp[i][i].first = st;
+        }
+        
+        for(int i = n - 1; i >= 1; i--)
+        {
+            for(int j = i + 1; j < n; j++)
+            {
+                int min_steps = 1e9;
+                string best_string;
+                
+                for(int k = i; k <= j - 1; k++)
+                {
+                    auto left_matrix = dp[i][k]; 
+                    auto right_matrix = dp[k + 1][j];
+                    
+                    int steps = arr[i - 1] * arr[k] * arr[j] +
+                    left_matrix.second + 
+                    right_matrix.second;
+                    string s = '(' + left_matrix.first + right_matrix.first + ')';
+                    
+                    if(steps < min_steps)
+                    {
+                        min_steps = steps;
+                        best_string = s; 
+                    }
+                }
+                
+                dp[i][j] = {best_string, min_steps};
+            }
+        }
+        
+        return dp[1][n - 1].first; // returns minimum steps along with the string of that partition
+    }
+};
