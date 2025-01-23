@@ -1,0 +1,40 @@
+*/ Question: Given a list of contacts contact[] of length n where each contact is a string which exist in a phone directory and a query string s. The task is to implement a search query for the phone directory. Run a search query for each prefix p of the query string s (i.e. from  index 1 to |s|) that prints all the distinct contacts which have the same prefix as p in lexicographical increasing order. Please refer the explanation part for better understanding.
+Note: If there is no match between query and contacts, print "0".
+
+Difficulty: Hard */
+
+
+vector<vector<string>> displayContacts(int n, string contact[], string s)
+    {
+        vector<vector<string>> ans;
+        set<string> st(contact, contact + n);
+        vector<string> ordered(st.begin(), st.end());
+        
+        string prefix = "";
+        
+        for(char ch: s)
+        {
+            prefix += ch;
+            vector<string> matches;
+            // check if prefix is there in contacts or not
+            for(string c: ordered)
+            {
+                if(prefix == c.substr(0, prefix.size()))
+                {
+                    matches.push_back(c);
+                }
+            }
+            
+            if(matches.empty()) // no contact matched
+            {
+                ans.push_back({"0"});
+            }
+            
+            else
+            {
+                ans.push_back(matches);
+            }
+        }
+        
+        return ans;
+    }
