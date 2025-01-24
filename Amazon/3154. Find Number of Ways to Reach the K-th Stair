@@ -1,0 +1,39 @@
+*/ Question: You are given a non-negative integer k. There exists a staircase with an infinite number of stairs, with the lowest stair numbered 0.
+
+Alice has an integer jump, with an initial value of 0. She starts on stair 1 and wants to reach stair k using any number of operations. If she is on stair i, in one operation she can:
+
+Go down to stair i - 1. This operation cannot be used consecutively or on stair 0.
+Go up to stair i + 2jump. And then, jump becomes jump + 1.
+Return the total number of ways Alice can reach stair k.
+
+Note that it is possible that Alice reaches the stair k, and performs some operations to reach the stair k again.
+
+Difficulty: Hard */
+
+
+class Solution {
+public:
+    int findWays(int k, int i, int back, int jump, unordered_map<int, unordered_map<int, unordered_map<int, int>>>& mpp)
+    {
+        if(i > k + 1) return 0;
+
+        if(mpp[i][back].find(jump) != mpp[i][back].end()) return mpp[i][back][jump]; 
+
+        int ans = (i == k); // if reahed at kth stair then we get 1 way...even ater that we can continue
+
+        int forward = findWays(k, i + pow(2, jump), 1, jump + 1, mpp);
+
+        int backwards = 0;
+        if(back && i > 0) // can move backwards
+        {
+            backwards = findWays(k, i - 1, 0, jump, mpp);
+        }
+
+        return mpp[i][back][jump] = ans + forward + backwards;
+    }
+
+    int waysToReachStair(int k) {
+        unordered_map<int, unordered_map<int, unordered_map<int, int>>> mpp; // to represent dp[i][back][jump]
+        return findWays(k, 1, 1, 0, mpp);
+    }
+};
