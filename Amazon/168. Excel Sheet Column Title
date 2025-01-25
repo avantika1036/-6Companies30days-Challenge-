@@ -1,0 +1,25 @@
+/* Question: Given an integer columnNumber, return its corresponding column title as it appears in an Excel sheet.
+
+Difficulty: Easy */
+
+
+class Solution {
+public:
+    string convertToTitle(int columnNumber) {
+        string ans = "";
+
+        while(columnNumber > 0)
+        {
+            // find the last charcter...since 26 chars are there so on getting the remainder you can skip those many characters from "A" and get that character
+            char ch = 'A' + (columnNumber - 1) % 26;
+
+            ans += ch;
+
+            columnNumber = (columnNumber - 1) / 26; // now get the alphabets remaining
+        }
+
+        reverse(ans.begin(), ans.end());
+
+        return ans;
+    }
+};
