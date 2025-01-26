@@ -1,0 +1,50 @@
+/* Question: Given a set of distinct positive integers nums, return the largest subset answer such that every pair (answer[i], answer[j]) of elements in this subset satisfies:
+
+- answer[i] % answer[j] == 0, or
+- answer[j] % answer[i] == 0
+If there are multiple solutions, return any of them.
+
+Difficulty: Medium */
+
+
+class Solution {
+public:
+    vector<int> largestDivisibleSubset(vector<int>& nums) {
+        int n = nums.size(), maxLen = 0, lastInd = -1;
+        sort(nums.begin(), nums.end());
+        vector<int> dp(n, 1); // max length till that index
+        vector<int> hash(n); // prev index
+
+        for(int i = 0; i < n; i++)
+        {
+            hash[i] = i;
+            for(int prev = 0; prev < i; prev++)
+            {
+                if((nums[prev] % nums[i] == 0 || nums[i] % nums[prev] == 0) && dp[i] < 1 + dp[prev])
+                {
+                    dp[i] = 1 + dp[prev];
+                    hash[i] = prev;
+                }
+            }
+
+            if(maxLen < dp[i])
+            {
+                maxLen = dp[i];
+                lastInd = i; // store last index of the max array
+            }
+        }
+
+        vector<int> res;
+        res.push_back(nums[lastInd]);
+
+        while(hash[lastInd] != lastInd)
+        {
+            lastInd = hash[lastInd];
+            res.push_back(nums[lastInd]);
+        }
+
+        reverse(res.begin(), res.end());
+
+        return res;
+    }
+};
