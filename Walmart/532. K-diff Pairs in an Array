@@ -1,0 +1,117 @@
+/* Question: Given an array of integers nums and an integer k, return the number of unique k-diff pairs in the array.
+
+A k-diff pair is an integer pair (nums[i], nums[j]), where the following are true:
+
+- 0 <= i, j < nums.length
+- i != j
+- |nums[i] - nums[j]| == k
+Notice that |val| denotes the absolute value of val.
+
+Difficulty: Medium */
+
+
+Solution 1: (Two-Pointer Approach) Tc - O(nlog(n)), SC - O(log(n))
+class Solution {
+public:
+    int findPairs(vector<int>& nums, int k) {
+        int count = 0, n = nums.size(), i = 0, j = 1;
+        sort(nums.begin(), nums.end()); 
+
+        while(j < n)
+        {
+            if(i == j)
+            {
+                j++;
+                continue;
+            }    
+            
+            if(nums[j] - nums[i] < k) // diff less...inc j
+            {
+                j++;
+            }
+
+            else if(nums[j] - nums[i] > k) // diff more...inc i
+            {
+                i++;
+            }
+
+            else
+            {
+                count++;
+                i++;
+                j++;
+
+                while(j < n && nums[j] == nums[j - 1]) j++;
+            }
+        }
+
+        return count;
+    }
+};
+
+
+// Solution 2: (Binary Search Approach) Tc - O(nlog(n)), SC - O(log(n))
+class Solution {
+public:
+    int binarySearch(vector<int>& nums, int i, int val)
+    {
+        int n = nums.size(), l = i, r = n - 1;
+
+        while(l <= r)
+        {
+            int mid = (l + r) / 2;
+
+            if(nums[mid] == val) return mid;
+
+            else if(nums[mid] < val) l = mid + 1;
+
+            else r = mid - 1;
+        }
+
+        return -1;
+    }
+
+    int findPairs(vector<int>& nums, int k) {
+        int count = 0, i = 1, n = nums.size();
+        sort(nums.begin(), nums.end()); //1 1 3 4 5
+
+        for(int i = 0; i < n; i++)
+        {
+            if(i > 0 && nums[i] == nums[i - 1]) continue; // skip duplicates
+            
+            if(binarySearch(nums, i + 1, nums[i] + k) != -1) count++;
+        }
+
+        return count;
+    }
+};
+
+
+// Solution 3: (Hash Map Approach) TC: O(n), SC: O(n)
+class Solution {
+public:
+    int findPairs(vector<int>& nums, int k) {
+        int count = 0;
+        unordered_map<int, int> freq;
+
+        for(int num: nums)
+        {
+            freq[num]++;
+        }
+
+        for(auto [num, f]: freq)
+        {
+            if(k == 0) // check if same value exist more thn once
+            {
+                if(freq[num] > 1) count++;
+            }
+
+            else
+            {
+                if(freq.count(num + k) > 0) count++;
+            }
+        }
+        
+        return count;
+    }
+};
