@@ -1,0 +1,111 @@
+/* Question: You are given two strings s and t of the same length and an integer maxCost.
+
+You want to change s to t. Changing the ith character of s to ith character of t costs |s[i] - t[i]| (i.e., the absolute difference between the ASCII values of the characters).
+
+Return the maximum length of a substring of s that can be changed to be the same as the corresponding substring of t with a cost less than or equal to maxCost. If there is no substring from s that can be changed to its corresponding substring from t, return 0.
+
+Difficulty: Medium */
+
+
+// Solution 1: using prefix sum + binary search
+// TC : O(nlog(n)), SC: O(n)
+class Solution {
+public:
+    int equalSubstring(string s, string t, int maxCost) {
+        // using prefix sum + binary search
+
+        int n = s.length(), cost = 0, maxLen = 0;
+        vector<int> sum(n + 1, 0);
+
+        for(int i = 0; i < n; i++)
+        {
+            sum[i + 1] = sum[i] + abs(s[i] - t[i]);
+        }
+
+        int r = 0, l = 0;
+        while(r < n)
+        {
+            int cost = sum[r + 1] - sum[l];
+
+            if(cost > maxCost)
+            {
+                l = lower_bound(sum.begin() + (l + 1), sum.end(), cost - maxCost) - sum.begin(); // valid beginning for the string where cost <= maxCost
+                cost = sum[r + 1] - sum[l];
+            }
+
+            maxLen = max(maxLen, r - l + 1);
+            r++;
+        }
+
+        return maxLen;
+    }
+};
+
+
+// Solution 2: // using prefix sum
+// TC : O(nlog(n)), SC: O(1)
+
+class Solution {
+public:
+    int equalSubstring(string s, string t, int maxCost) {
+        // using prefix sum
+
+        int n = s.length(), cost = 0, maxLen = 0;
+        vector<int> sum(n + 1, 0);
+
+        for(int i = 0; i < n; i++)
+        {
+            sum[i + 1] = sum[i] + abs(s[i] - t[i]);
+        }
+
+        int r = 0, l = 0;
+        while(r < n)
+        {
+            int cost = sum[r + 1] - sum[l];
+
+            while(cost > maxCost)
+            {
+                l++;
+                cost = sum[r + 1] - sum[l];
+            }
+
+            maxLen = max(maxLen, r - l + 1);
+            r++;
+        }
+
+        return maxLen;
+    }
+};
+
+
+// Solution 3: sliding window
+// TC : O(n), SC: O(1)
+class Solution {
+public:
+    int equalSubstring(string s, string t, int maxCost) {
+        int l = 0, r = 0, n = s.length(), cost = 0, maxLen = 0;
+
+        while(r < n)
+        {
+            cost += abs(s[r] - t[r]);
+            
+            if(cost <= maxCost)
+            {
+                maxLen = max(maxLen, r - l + 1);               
+            }
+
+            else
+            {
+                while(cost > maxCost)
+                {
+                    cost -= abs(s[l] - t[l]);
+                    l++;
+                }
+            }
+
+            r++;
+        }
+
+        return maxLen;
+    }
+};
