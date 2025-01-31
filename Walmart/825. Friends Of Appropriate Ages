@@ -1,0 +1,71 @@
+/* Question: There are n persons on a social media website. You are given an integer array ages where ages[i] is the age of the ith person.
+
+A Person x will not send a friend request to a person y (x != y) if any of the following conditions is true:
+
+age[y] <= 0.5 * age[x] + 7
+age[y] > age[x]
+age[y] > 100 && age[x] < 100
+Otherwise, x will send a friend request to y.
+
+Note that if x sends a request to y, y will not necessarily send a request to x. Also, a person will not send a friend request to themself.
+
+Return the total number of friend requests made.
+
+Difficulty: Medium */
+
+
+// Solution 1: Sorting + 2 pointer
+//TC - O(nlog(n)), SC - O(1)
+
+class Solution {
+public:
+    int numFriendRequests(vector<int>& ages) {
+        int n = ages.size(), total_requests = 0;
+        sort(ages.begin(), ages.end());
+
+        for(int x = 0; x < n; x++) // sender
+        {
+            int min_age = 0.5 * ages[x] + 7;
+            int y = upper_bound(ages.begin(), ages.end(), min_age) - ages.begin(); // valid receiver start point
+            int k = upper_bound(ages.begin(), ages.end(), ages[x]) - ages.begin(); // valid sender end point: done this when we have same age sender and receiver
+
+            total_requests += max(0, k - y - 1);
+        }
+
+        return total_requests;
+    }
+};
+
+
+// Solution 2: hash map
+//TC - O(n), SC - O(n)
+class Solution {
+public:
+    int numFriendRequests(vector<int>& ages) {
+        int n = ages.size(), total_requests = 0;
+        vector<int> freq(121);
+
+        for(int age: ages)
+        {
+            freq[age]++;
+        }
+
+        for(int x = 1; x < 121; x++)
+        {
+            if(freq[x] == 0) continue; // no y
+            
+            for(int y = 1; y < 121; y++)
+            {
+                if(freq[y] == 0) continue; // no y
+
+                if(y <= x && y > 0.5 * x + 7)
+                {
+                    total_requests += freq[x] * (freq[y] - (x == y ? 1 : 0));
+                    // (x == y ? 1 : 0) this condition will subtract 1 pair if x and y both are same so that the same person does not send request to itself
+                }
+            }
+        }
+
+        return total_requests;
+    }
+};
