@@ -1,0 +1,111 @@
+/* Question: Given two integer arrays nums1 and nums2, return the maximum length of a subarray that appears in both arrays.
+
+Difficulty: Medium */
+
+
+// Solution 1: DP
+// TC : O(n * m), SC : O(n + m)
+
+class Solution {
+public:
+    int findLength(vector<int>& nums1, vector<int>& nums2) {
+        int n = nums1.size(), m = nums2.size(), maxLen = 0;
+        vector<vector<int>> dp(n + 1, vector<int>(m + 1, 0));
+
+        for(int i = n - 1; i >= 0; i--)
+        {
+            for(int j = m - 1; j >= 0; j--)
+            {
+                if(nums1[i] == nums2[j])
+                {
+                    dp[i][j] = 1 + dp[i + 1][j + 1];
+                    maxLen = max(maxLen, dp[i][j]);
+                }
+            }
+        }
+
+        return maxLen;
+    }
+};
+
+
+// Solution 2: DP(Space optimized)
+// TC : O(n * m), SC : O(m)
+class Solution {
+public:
+    int findLength(vector<int>& nums1, vector<int>& nums2) {
+        int n = nums1.size(), m = nums2.size(), maxLen = 0;
+        vector<int> prev(m + 1, 0);
+
+        for(int i = n - 1; i >= 0; i--)
+        {
+            vector<int> temp(m + 1, 0);
+            for(int j = m - 1; j >= 0; j--)
+            {
+                if(nums1[i] == nums2[j])
+                {
+                    temp[j] = 1 + prev[j + 1];
+                    maxLen = max(maxLen, temp[j]);
+                }
+            }
+
+            prev = temp;
+        }
+
+        return maxLen;
+    }
+};
+
+
+// Solution 3: Binary Search + Rolling Hash (Rabin-Karp Algorithm) 
+// // TC : O(n + m), SC : O(n)
+
+class Solution {
+public:
+    // Binary Search + Rolling Hash (Rabin-Karp Algorithm) 
+
+    bool check(vector<int>& nums1, vector<int>& nums2, int len)
+    {
+        int n = nums1.size(), m = nums2.size();
+        unordered_set<string> hash;
+
+        for(int i = 0; i + len <= n; i++)
+        {
+            hash.insert(string(nums1.begin() + i, nums1.begin() + i + len));
+        }
+
+        for(int i = 0; i + len <= m; i++)
+        {
+            if(hash.count(string(nums2.begin() + i, nums2.begin() + i + len)))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    int findLength(vector<int>& nums1, vector<int>& nums2) {
+        int l = 0, r = min(nums1.size(), nums2.size()), maxLen = 0;
+        // r is the size of max array length which can be common
+
+        while(l <= r)
+        {
+            int mid = (l + r) / 2;
+
+            if(check(nums1, nums2, mid))
+            {
+                // inc the common array length si
+                maxLen = mid;
+                l = mid + 1;
+            }
+
+            else // reduce the common array length size
+            {
+                r = mid - 1;
+            }
+        }
+
+        return maxLen;
+    }
+};
