@@ -1,0 +1,68 @@
+/* Question: You are given a 0-indexed string s and a dictionary of words dictionary. You have to break s into one or more non-overlapping substrings such that each substring is present in dictionary. There may be some extra characters in s which are not present in any of the substrings.
+
+Return the minimum number of extra characters left over if you break up s optimally.
+
+Difficulty: Medium */
+
+
+// Solution 1: Memoization
+class Solution {
+public:
+    int check(string s, unordered_set<string> st, int i, vector<int> &dp)
+    {
+        int n = s.length();
+        if(i == n) return 0;
+
+        if(dp[i] != -1) return dp[i];
+
+        int minCount = 1 + check(s, st, i + 1, dp); // assuming i is not in the dic
+
+        for(int j = i; j < n; j++)
+        {
+            string word = s.substr(i, j - i + 1);
+            if(st.find(word) != st.end())
+            {
+                minCount = min(minCount, check(s, st, j + 1, dp)); 
+            }
+        }
+
+        return dp[i] = minCount;
+    }
+
+    int minExtraChar(string s, vector<string>& dictionary) {
+        int n = s.length();
+        unordered_set<string> st(dictionary.begin(), dictionary.end());
+        vector<int> dp(n, -1);
+
+        return check(s, st, 0, dp);
+    }
+};
+
+
+// Solution 2: Tabulation
+class Solution {
+public:
+    int minExtraChar(string s, vector<string>& dictionary) {
+        int n = s.length();
+        unordered_set<string> st(dictionary.begin(), dictionary.end());
+        vector<int> dp(n + 1, 0);
+
+        for(int i = n - 1; i >= 0; i--)
+        {
+            int minCount = 1 + dp[i + 1]; // assuming i is not in the dic
+
+            for(int j = i; j < n; j++)
+            {
+                string word = s.substr(i, j - i + 1);
+                if(st.find(word) != st.end())
+                {
+                    minCount = min(minCount, dp[j + 1]); 
+                }
+            }
+
+            dp[i] = minCount;
+        }
+
+        return dp[0];
+    }
+};
