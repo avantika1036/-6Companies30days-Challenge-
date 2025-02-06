@@ -1,0 +1,74 @@
+/* Question: You are given an integer mass, which represents the original mass of a planet. You are further given an integer array asteroids, where asteroids[i] is the mass of the ith asteroid.
+
+You can arrange for the planet to collide with the asteroids in any arbitrary order. If the mass of the planet is greater than or equal to the mass of the asteroid, the asteroid is destroyed and the planet gains the mass of the asteroid. Otherwise, the planet is destroyed.
+
+Return true if all asteroids can be destroyed. Otherwise, return false.
+
+Difficulty: Medium */
+
+
+// Solution 1: Greedy
+// TC - O(nlog n), SC - O(log n)
+class Solution {
+public:
+    bool asteroidsDestroyed(int mass, vector<int>& asteroids) {
+        sort(asteroids.begin(), asteroids.end());
+
+        long long planetMass = mass;
+        
+        for(int asteroid: asteroids)
+        {
+            if(planetMass >= asteroid)
+            {
+                planetMass += asteroid;
+            }
+
+            else
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+};
+
+
+// Solution 1: Quick Select
+// TC - O(n), SC - O(1)
+class Solution {
+public:
+    bool asteroidsDestroyed(int mass, vector<int>& asteroids) {
+        int partInd = 0;
+        int prevInd = -1;
+        long long planetMass = mass;
+
+        while(true)
+        {
+            // keep all the small masses to the left of current planetMass
+            for(int i = partInd; i < asteroids.size(); i++)
+            {
+                if(planetMass >= asteroids[i])
+                {
+                    planetMass += asteroids[i];
+                    swap(asteroids[partInd], asteroids[i]);
+                    partInd++;
+                }
+            }
+
+            if(partInd == asteroids.size()) // all asteroids are destroyed
+            {
+                return true;
+            }
+
+            if(partInd == prevInd) // no swap in the cycle 
+            {
+                return false;
+            }
+
+            prevInd = partInd;
+        }
+
+        return false;
+    }
+};
