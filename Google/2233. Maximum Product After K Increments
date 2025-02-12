@@ -1,0 +1,37 @@
+/* Question: You are given an array of non-negative integers nums and an integer k. In one operation, you may choose any element from nums and increment it by 1.
+
+Return the maximum product of nums after at most k operations. Since the answer may be very large, return it modulo 109 + 7. Note that you should maximize the product before taking the modulo. 
+
+Difficulty: Medium */
+
+
+class Solution {
+public:
+    int maximumProduct(vector<int>& nums, int k) {
+        const int mod = 1e9 + 7;
+        int n = nums.size();
+        priority_queue<int, vector<int>, greater<int>> min_heap;
+
+        for(int num: nums)
+        {
+            min_heap.push(num);
+        }
+
+        while(k--)
+        {
+            int min_val = min_heap.top();
+            min_heap.pop();
+
+            min_heap.push(++min_val);
+        }
+
+        long long product = 1;
+        while(!min_heap.empty())
+        {
+            product = (product * min_heap.top()) % mod;
+            min_heap.pop();
+        }
+
+        return product;
+    }
+};
