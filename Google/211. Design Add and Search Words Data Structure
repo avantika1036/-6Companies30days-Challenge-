@@ -1,0 +1,78 @@
+/* Question: Design a data structure that supports adding new words and finding if a string matches any previously added string.
+
+Implement the WordDictionary class:
+
+- WordDictionary() Initializes the object.
+- void addWord(word) Adds word to the data structure, it can be matched later.
+- bool search(word) Returns true if there is any string in the data structure that matches word or false otherwise. word may contain dots '.' where dots can be matched with any letter.
+
+Difficulty: Medium */
+
+
+class WordDictionary {
+public:
+    struct TrieNode
+    {
+        TrieNode* children[26] = {NULL};
+        bool isEnd = false;
+    };
+
+    TrieNode* root;
+
+    WordDictionary() {
+        root = new TrieNode(); // initialise root
+    }
+    
+    void addWord(string word) {
+        TrieNode* node = root;
+
+        for(char ch: word)
+        {
+            int ind = ch - 'a';
+            
+            if(!node -> children[ind])
+            {
+                node -> children[ind] = new TrieNode();
+            }    
+
+            node = node -> children[ind];
+        }
+
+        node -> isEnd = true; // mark end of word at last char
+    }
+    
+    bool searchHelper(string word, TrieNode* node, int ind)
+    {
+        if(!node) return false; // null node
+
+        if(ind == word.length()) return node -> isEnd;
+
+        char c = word[ind];
+
+        if(c == '.')
+        {
+            for(int i = 0; i < 26; i++) // try all letters
+            {
+                if(searchHelper(word, node -> children[i], ind + 1)) return true;
+            }
+            return false;
+        }
+
+        else
+        {
+            int i = c - 'a';
+            return searchHelper(word, node -> children[i], ind + 1);
+        }
+    }
+
+    bool search(string word) {
+        return searchHelper(word, root, 0);
+    }
+};
+
+/**
+ * Your WordDictionary object will be instantiated and called as such:
+ * WordDictionary* obj = new WordDictionary();
+ * obj->addWord(word);
+ * bool param_2 = obj->search(word);
+ */
