@@ -1,0 +1,54 @@
+/* Question: You are given the two integers, n and m and two integer arrays, hBars and vBars. The grid has n + 2 horizontal and m + 2 vertical bars, creating 1 x 1 unit cells. The bars are indexed starting from 1.
+
+You can remove some of the bars in hBars from horizontal bars and some of the bars in vBars from vertical bars. Note that other bars are fixed and cannot be removed.
+
+Return an integer denoting the maximum area of a square-shaped hole in the grid, after removing some bars (possibly none).
+
+Difficulty: Medium */
+
+
+class Solution {
+public:
+    int maximizeSquareHoleArea(int n, int m, vector<int>& hBars, vector<int>& vBars) {
+        int maxHGap = 2, maxVGap = 2, currHGap = 2, currVGap = 2;
+
+        sort(hBars.begin(), hBars.end());
+        sort(vBars.begin(), vBars.end());
+
+        // find max horizontal gap
+        for(int i = 1; i < hBars.size(); i++)
+        {
+            if(hBars[i - 1] + 1 == hBars[i]) // consective bars
+            {
+                currHGap++;
+            }
+
+            else
+            {
+                currHGap = 2;
+            }    
+
+            maxHGap = max(maxHGap, currHGap);
+        }
+
+        // find max vertical gap
+        for(int i = 1; i < vBars.size(); i++)
+        {
+            if(vBars[i - 1] + 1 == vBars[i]) // consective bars
+            {
+                currVGap++;
+            }
+
+            else
+            {
+                currVGap = 2;
+            }
+
+            maxVGap = max(currVGap, maxVGap);
+        }
+
+        int maxPossibleGap = min(maxHGap, maxVGap);
+
+        return maxPossibleGap * maxPossibleGap;
+    }
+};

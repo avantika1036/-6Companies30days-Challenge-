@@ -1,0 +1,68 @@
+/* Question: Design a data structure that follows the constraints of a Least Recently Used (LRU) cache.
+
+Implement the LRUCache class:
+
+- LRUCache(int capacity) Initialize the LRU cache with positive size capacity.
+- int get(int key) Return the value of the key if the key exists, otherwise return -1.
+- void put(int key, int value) Update the value of the key if the key exists. Otherwise, add the key-value pair to the cache. If the number of keys exceeds the capacity from this operation, evict the least recently used key.
+The functions get and put must each run in O(1) average time complexity.
+
+Difficulty: Medium */
+
+
+class LRUCache {
+public:
+    int cap;
+    list<int> dll;
+    unordered_map<int, pair<list<int>::iterator, int>> mpp; // {key, {address, value}}
+
+    LRUCache(int capacity) {
+        cap = capacity;
+    }
+
+    void makeRecentlyUsed(int key)
+    {
+        dll.erase(mpp[key].first);
+        dll.push_front(key);
+        mpp[key].first = dll.begin();
+    }
+    
+    int get(int key) {
+        if(mpp.find(key) != mpp.end())
+        {
+            makeRecentlyUsed(key);
+            return mpp[key].second;
+        }
+
+        return -1;
+    }
+    
+    void put(int key, int value) {
+        if(mpp.find(key) != mpp.end()) // update the already present key
+        {
+            mpp[key].second = value;
+            makeRecentlyUsed(key);
+        }
+
+        else
+        {
+            dll.push_front(value);
+            mpp[key] = {dll.begin(), value};
+            makeRecentlyUsed(key);
+        }
+
+        if(mpp.size() > cap) // delete last(less used) cache key
+        {
+            int deleteKey = dll.back();
+            mpp.erase(deleteKey);
+            dll.pop_back();
+        }
+    }
+};
+
+/**
+ * Your LRUCache object will be instantiated and called as such:
+ * LRUCache* obj = new LRUCache(capacity);
+ * int param_1 = obj->get(key);
+ * obj->put(key,value);
+ */
