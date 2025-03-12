@@ -1,0 +1,125 @@
+/* Question: You are given a 0-indexed string s, a string a, a string b, and an integer k.
+
+An index i is beautiful if:
+
+- 0 <= i <= s.length - a.length
+- s[i..(i + a.length - 1)] == a
+- There exists an index j such that:
+    - 0 <= j <= s.length - b.length
+    - s[j..(j + b.length - 1)] == b
+    - |j - i| <= k
+Return the array that contains beautiful indices in sorted order from smallest to largest.
+
+Difficulty: Medium */
+
+
+// Solution 1: TC - O(n * n), SC - O(n)
+class Solution {
+public:
+    vector<int> beautifulIndices(string s, string a, string b, int k) {
+        int lens = s.length(), lena = a.length(), lenb = b.length();
+
+        vector<int> index_i;
+        for(int i = 0; i <= lens - lena; i++)
+        {
+            if(s.substr(i, lena) == a)
+            {
+                index_i.push_back(i);
+            }
+        }
+
+        vector<int> index_j;
+        for(int j = 0; j <= lens - lenb; j++)
+        {
+            if(s.substr(j, lenb) == b)
+            {
+                index_j.push_back(j);
+            }
+        }
+
+        vector<int> beautiful_ind;
+        for(int i = 0; i < index_i.size(); i++)
+        {
+            for(int j = 0; j < index_j.size(); j++)
+            {
+                if(abs(index_i[i] - index_j[j]) <= k)
+                {
+                    beautiful_ind.push_back(index_i[i]);
+                    break;
+                }
+            }
+        }
+
+        return beautiful_ind;
+    }
+};
+
+
+// Solution 2: TC - O(n log n), SC - O(n)
+class Solution {
+public:
+    vector<int> kmpSearch(string &text, string &pat)
+    {
+        int m = pat.size(), n = text.size(), j = 0;
+        vector<int> lps(m, 0);
+
+        // compute lps array
+        for(int i = 1; i < m; i++)
+        {
+            while(j > 0 && pat[i] != pat[j])
+            {
+                j = lps[j - 1];
+            }
+
+            if(pat[i] == pat[j])
+            {
+                lps[i] = ++j;
+            }
+        }
+        
+        // use kmp search to find occurences of pat in text
+        vector<int> occurences;
+
+        j = 0;
+        for(int i = 0; i < n; i++)
+        {
+            while(j > 0 && text[i] != pat[j])
+            {
+                j = lps[j - 1]; // search for smaller substring
+            }
+
+            if(text[i] == pat[j])
+            {
+                j++;
+            }
+
+            if(j == m) // all chars in pattern got matched
+            {
+                occurences.push_back(i - m + 1);
+                j = lps[j - 1];
+            }
+        }
+
+        return occurences;
+    }
+
+    vector<int> beautifulIndices(string s, string a, string b, int k) {
+        vector<int> ind_a = kmpSearch(s, a);
+        vector<int> ind_b = kmpSearch(s, b);
+        vector<int> res;
+
+        // binary search
+        for(int i: ind_a)
+        {
+            // i - k <= j <= i + k....(find first occ of j >= i - k)
+            auto it = lower_bound(ind_b.begin(), ind_b.end(), i - k); 
+
+            if(it != ind_b.end() && *it <= i + k)
+            {
+                res.push_back(i);
+            }
+        }
+
+        return res;
+    }
+};
