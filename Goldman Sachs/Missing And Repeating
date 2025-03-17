@@ -1,0 +1,68 @@
+/* Question: Given an unsorted array arr of positive integers. One number a from the set [1, 2,....,n] is missing and one number b occurs twice in the array. Find numbers a and b.
+
+Note: The test cases are generated such that there always exists one missing and one repeating number within the range [1,n].
+
+Difficulty: Easy */
+
+
+// Solution 1: TC- O(n), SC- O(n)
+class Solution {
+  public:
+    vector<int> findTwoElement(vector<int>& arr) {
+        unordered_map<int, int> freq;
+        
+        for(int num: arr)
+        {
+            freq[num]++;
+        }
+        
+        int repeating, missing;
+        
+        for(int key = 1; key <= arr.size(); key++)
+        {
+            int val = freq[key];
+            
+            if(val == 2)
+            {
+                repeating = key;
+            }
+            
+            else if(val == 0)
+            {
+                missing = key;
+            }
+        }
+        
+        return {repeating, missing};
+    }
+};
+
+
+// Solution 1: TC- O(n), SC- O(1)
+
+class Solution {
+    public:
+      vector<int> findTwoElement(vector<int>& arr) {
+          int x, y; // x = repeating, y = missing
+          long long s1 = 0, s2 = 0, s1n, s2n, n = arr.size(); 
+          
+          s1n = (n * (n + 1)) / 2;
+          s2n = (n * (n + 1) * (2*n + 1)) / 6;
+          
+          for(int num: arr)
+          {
+              s1 += num;
+              s2 += (1LL * num * num);
+          }
+          
+          long long val1 = (s1 - s1n); // x - y
+          long long val2 = (s2 - s2n); // x^2 - y^2 = (x + y)(x - y)
+          
+          val2 = val2 / val1; // x + y
+          
+          x = (val1 + val2) / 2;
+          y= (val2 - val1) / 2;
+          
+          return {x, y};
+      }
+  };
